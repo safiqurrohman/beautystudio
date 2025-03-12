@@ -54,28 +54,52 @@
                             </table>
                             <nav aria-label="Pagination">
                                 <ul class="pagination">
-                                    <!-- Tombol Previous -->
+                                   
+                                    @if ($getPengguna->currentPage() > 3)
+                                    <li class="page-item">
+                                        <a class="page-link" wire:click="gotoPage(1)" style="cursor: pointer;">
+                                            &laquo;&laquo; First
+                                        </a>
+                                    </li>
+                                    @endif
+
+                                    <!-- {{-- Tombol Previous --}} -->
                                     <li class="page-item {{ $getPengguna->onFirstPage() ? 'disabled' : '' }}">
                                         <a class="page-link" wire:click="previousPage" wire:loading.attr="disabled" style="cursor: pointer;">
                                             &laquo; Previous
                                         </a>
                                     </li>
 
-                                    <!-- Nomor Halaman -->
-                                    @for ($page = 1; $page <= $getPengguna->lastPage(); $page++)
+                                    <!-- menampilkan maksimal 3 halaman  -->
+                                    @php
+                                    $start = max($getPengguna->currentPage() - 2, 1);
+                                    $end = min($getPengguna->currentPage() + 2, $getPengguna->lastPage());
+                                    @endphp
+
+                                    @for ($page = $start; $page <= $end; $page++)
                                     <li class="page-item {{ $page == $getPengguna->currentPage() ? 'active' : '' }}">
-                                        <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
+                                    <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
                                     </li>
                                     @endfor
 
-                                    <!-- Tombol Next -->
+                                    <!-- {{-- Tombol Next --}} -->
                                     <li class="page-item {{ !$getPengguna->hasMorePages() ? 'disabled' : '' }}">
                                         <a class="page-link" wire:click="nextPage" wire:loading.attr="disabled" style="cursor: pointer;">
                                             Next &raquo;
                                         </a>
                                     </li>
+
+                                    <!-- {{-- Tombol Last --}} -->
+                                    @if ($getPengguna->currentPage() < $getPengguna->lastPage() - 2)
+                                    <li class="page-item">
+                                        <a class="page-link" wire:click="gotoPage({{ $$getPengguna->lastPage() }})" style="cursor: pointer;">
+                                            Last &raquo;
+                                        </a>
+                                    </li>
+                                    @endif
                                 </ul>
                             </nav>
+
                         </div>
                     </div>
                 </div>
@@ -207,17 +231,5 @@
             });
         });
     </script>
-
-    <!-- Script untuk menutup modal setelah hapus/batal -->
-    <!-- <script>
-        document.addEventListener('livewire:load', function() {
-            Livewire.on('tutupModal', () => {
-                var hapusModal = bootstrap.Modal.getInstance(document.getElementById('hapusModal'));
-                if (hapusModal) {
-                    hapusModal.hide();
-                }
-            });
-        });
-    </script> -->
 
 </div>

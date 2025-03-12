@@ -49,7 +49,7 @@
                                     <th class="text-center">Customer</th>
                                     <th class="text-center">Treatment</th>
                                     <th class="text-center">Harga</th>
-                                    <th class="text-center">Gaji</th>
+                                    <th class="text-center">Komisi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,23 +72,52 @@
                         </table>
                         <nav aria-label="Pagination">
                             <ul class="pagination">
+                                <!-- Tombol First  -->
+                                @if ($laporan->currentPage() > 3)
+                                <li class="page-item">
+                                    <a class="page-link" wire:click="gotoPage(1)" style="cursor: pointer;">
+                                        &laquo; First
+                                    </a>
+                                </li>
+                                @endif
+
+                                <!-- Tombol Previous  -->
                                 <li class="page-item {{ $laporan->onFirstPage() ? 'disabled' : '' }}">
                                     <a class="page-link" wire:click="previousPage" wire:loading.attr="disabled" style="cursor: pointer;">
                                         &laquo; Previous
                                     </a>
                                 </li>
-                                @for ($page = 1; $page <= $laporan->lastPage(); $page++)
+
+                                <!-- Menampilkan maksimal 3 halaman sebelum dan sesudah halaman saat ini -->
+                                @php
+                                $start = max($laporan->currentPage() - 2, 1);
+                                $end = min($laporan->currentPage() + 2, $laporan->lastPage());
+                                @endphp
+
+                                @for ($page = $start; $page <= $end; $page++)
                                     <li class="page-item {{ $page == $laporan->currentPage() ? 'active' : '' }}">
-                                        <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
+                                    <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
                                     </li>
                                     @endfor
+
+                                    <!-- Tombol Next -->
                                     <li class="page-item {{ !$laporan->hasMorePages() ? 'disabled' : '' }}">
                                         <a class="page-link" wire:click="nextPage" wire:loading.attr="disabled" style="cursor: pointer;">
                                             Next &raquo;
                                         </a>
                                     </li>
+
+                                    <!-- Tombol Last-->
+                                    @if ($laporan->currentPage() < $laporan->lastPage() - 2)
+                                        <li class="page-item">
+                                            <a class="page-link" wire:click="gotoPage({{ $laporan->lastPage() }})" style="cursor: pointer;">
+                                                Last &raquo;
+                                            </a>
+                                        </li>
+                                        @endif
                             </ul>
                         </nav>
+
 
                     </div>
                 </div>
@@ -135,7 +164,7 @@
                                     <th class="text-center">Customer</th>
                                     <th class="text-center">Treatment</th>
                                     <th class="text-center">Harga</th>
-                                    <th class="text-center">Gaji</th>
+                                    <th class="text-center">Komisi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -151,7 +180,7 @@
                                 </tr>
                                 @endforeach
                                 <tr class="col-span-6">
-                                    <td colspan="6"><strong>Total Gaji :</strong></td>
+                                    <td colspan="6"><strong>Total Komisi :</strong></td>
                                     <td><strong>Rp{{ number_format($totalGaji, 0, ',', '.') }}</strong></td>
                                 </tr>
                             </tbody>

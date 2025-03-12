@@ -57,9 +57,12 @@
                     <i class="bi bi-intersect" style="font-size: 1.4rem;"></i> Treatment
                 </a>
                 @endif
+
+                @if(Auth::user()->role ==  'karyawan')
                 <a href="{{ route('transaksi')}}" class="submenu my-1 {{ request()->routeIs('transaksi') ? 'btn-pink' : 'btn-outline-light'}}">
                     <i class="bi bi-pencil-square" style="font-size: 1.4rem;"></i> Transaksi
                 </a>
+                @endif
 
                 <a href="{{ route('laporan')}}" class="submenu my-1 {{ request()->routeIs('laporan') ? 'btn-pink' : 'btn-outline-light'}}">
                     <i class="bi bi-journals" style="font-size: 1.4rem;"></i>

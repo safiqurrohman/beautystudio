@@ -26,6 +26,4 @@ class Transaksi extends Model
     {
         return $this->belongsTo(Treatment::class, 'id_treatment');
     }
-
-}
-
+} 

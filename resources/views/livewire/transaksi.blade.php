@@ -7,8 +7,8 @@
                     class="btn {{ $pilihanMenu=='lihat' ? 'btn-primary' : 'btn-outline-primary'}}">
                     Data
                 </button>
-                <button wire:click="pilihMenu('lihat')"
-                    class="btn {{ $pilihanMenu=='lihat' ? 'btn-success' : 'btn-outline-success'}}">
+                <button wire:click="pilihMenu('tambah')"
+                    class="btn {{ $pilihanMenu=='tambah' ? 'btn-success' : 'btn-outline-success'}}">
                     Transaksi
                 </button>
             </div>
@@ -55,28 +55,52 @@
                             </table>
                             <nav aria-label="Pagination">
                                 <ul class="pagination">
-                                    <!-- Tombol Previous -->
+                                    <!-- {{-- Tombol First --}} -->
+                                    @if ($getTransaksi->currentPage() > 3)
+                                    <li class="page-item">
+                                        <a class="page-link" wire:click="gotoPage(1)" style="cursor: pointer;">
+                                            &laquo; First
+                                        </a>
+                                    </li>
+                                    @endif
+
+                                    <!-- {{-- Tombol Previous --}} -->
                                     <li class="page-item {{ $getTransaksi->onFirstPage() ? 'disabled' : '' }}">
                                         <a class="page-link" wire:click="previousPage" wire:loading.attr="disabled" style="cursor: pointer;">
                                             &laquo; Previous
                                         </a>
                                     </li>
 
-                                    <!-- Nomor Halaman -->
-                                    @for ($page = 1; $page <= $getTransaksi->lastPage(); $page++)
+                                    <!-- menampilkan maksimal 3 halaman -->
+                                    @php
+                                    $start = max($getTransaksi->currentPage() - 2, 1);
+                                    $end = min($getTransaksi->currentPage() + 2, $getTransaksi->lastPage());
+                                    @endphp
+
+                                    @for ($page = $start; $page <= $end; $page++)
                                         <li class="page-item {{ $page == $getTransaksi->currentPage() ? 'active' : '' }}">
-                                            <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
+                                        <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
                                         </li>
                                         @endfor
 
-                                        <!-- Tombol Next -->
+                                        <!-- {{-- Tombol Next --}} -->
                                         <li class="page-item {{ !$getTransaksi->hasMorePages() ? 'disabled' : '' }}">
                                             <a class="page-link" wire:click="nextPage" wire:loading.attr="disabled" style="cursor: pointer;">
                                                 Next &raquo;
                                             </a>
                                         </li>
+
+                                        <!-- {{-- Tombol Last --}} -->
+                                        @if ($getTransaksi->currentPage() < $getTransaksi->lastPage() - 2)
+                                            <li class="page-item">
+                                                <a class="page-link" wire:click="gotoPage({{ $getTransaksi->lastPage() }})" style="cursor: pointer;">
+                                                    Last &raquo;
+                                                </a>
+                                            </li>
+                                            @endif
                                 </ul>
                             </nav>
+
                         </div>
                     </div>
                 </div>
@@ -84,100 +108,78 @@
                 @elseif($pilihanMenu == 'tambah')
                 <div class="card border-primary">
                     <div class="card-header">
-                        <form wire:submit='simpan'>
-                            <label class="mt-2">Nama Lengkap</label>
-                            <input type="text" class="form-control" wire:model='nama' placeholder="Masukkan Nama" />
-                            @error('nama')
-                            <span class="text-danger">{{$message}}</span>
-                            @enderror
-                            <br>
-                            <label class="mt-2">Alamat Email</label>
-                            <input type="email" class="form-control" wire:model='email' placeholder="Masukkan Email" />
-                            @error('email')
-                            <span class="text-danger">{{$message}}</span>
-                            @enderror
-                            <br>
-                            <label class="mt-2">Password</label>
-                            <input type="text" class="form-control" wire:model='password' placeholder="Masukkan Password" />
-                            @error('password')
-                            <span class="text-danger">{{$message}}</span>
-                            @enderror
-                            <br>
-                            <label class="mt-2">Status</label>
-                            <select class="form-control" wire:model='role'>
-                                <option value="">Pilih Status User</option>
-                                <option value="admin">Admin</option>
-                                <option value="karyawan">Karyawan</option>
-                                <option value="custemer">Pelanggan</option>
-                            </select>
-                            @error('role')
-                            <span class="text-danger">{{$message}}</span>
-                            @enderror
-                            <br>
-                            <button type="submit" class="btn btn-primary mt-3">Simpan</button>
-                            <button type="button" class="btn btn-secondary mt-3" wire:click='batal'>Batal</button>
-                        </form>
-                    </div>
-                </div>
-                @elseif($pilihanMenu == 'edit')
-                <div class="card border-primary">
-                    <div class="card-header">
-                        Edit Pengguna
+                        <h2 class="text-xl font-bold mb-4">Lakukan Transaksi</h2>
+                        @if (session()->has('message'))
+                        <div class="alert alert-success">{{ session('message') }}</div>
+                        @endif
+                        @if (session()->has('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                        @endif
                     </div>
                     <div class="card-body">
-                        <form wire:submit='simpanEdit'>
-                            <label class="mt-2">Nama Lengkap</label>
-                            <input type="text" class="form-control" wire:model='nama' placeholder="Masukkan Nama" readonly />
-                            @error('nama')
-                            <span class="text-danger">{{$message}}</span>
-                            @enderror
-                            <br>
-                            <label class="mt-2">Alamat Email</label>
-                            <input type="email" class="form-control" wire:model='email' placeholder="Masukkan Email" readonly />
-                            @error('email')
-                            <span class="text-danger">{{$message}}</span>
-                            @enderror
-                            <br>
-                            <label class="mt-2">Status</label>
-                            <select class="form-control" wire:model='role'>
-                                <option value="">Pilih Status User</option>
-                                <option value="admin">Admin</option>
-                                <option value="karyawan">Karyawan</option>
-                                <option value="customer">Pelanggan</option>
-                            </select>
-                            @error('role')
-                            <span class="text-danger">{{$message}}</span>
-                            @enderror
-                            <br>
-                            <button type="submit" class="btn btn-primary mt-3">Simpan</button>
-                            <button type="button" class="btn btn-secondary mt-3" wire:click='batal'>Batal</button>
+                        <form wire:submit.prevent="simpan">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Lengkap</label>
+                                        <input type="text" class="form-control" wire:model="nama" placeholder="Masukkan Nama Lengkap">
+                                        @error('nama') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">No HP</label>
+                                        <input type="text" class="form-control" wire:model="phone" placeholder="Masukkan No HP">
+                                        @error('phone') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Alamat</label>
+                                        <input type="text" class="form-control" wire:model="address" placeholder="Masukkan Alamat">
+                                        @error('address') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Pilih Treatment</label>
+                                        <select wire:model="id_treatment" class="form-select">
+                                            <option value="">Pilih Treatment</option>
+                                            @foreach($getTreatment as $t)
+                                            <option value="{{ $t->id }}">{{ $t->nama }} - Rp{{ number_format($t->harga, 0, ',', '.') }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('id_treatment') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Pilih Karyawan</label>
+                                        <select wire:model="id_karyawan" class="form-select">
+                                            <option value="">Pilih Karyawan</option>
+                                            @foreach($getKaryawan as $k)
+                                            @if($k->role == 'karyawan')
+                                            <option value="{{ $k->id }}">{{ $k->name }}</option>
+                                            @endif
+                                            @endforeach
+                                        </select>
+                                        @error('id_karyawan') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Jumlah Bayar</label>
+                                        <input type="number" class="form-control" wire:model="bayar">
+                                        @error('bayar') <span class="text-danger">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tombol Simpan di Kanan Bawah -->
+                            <div class="d-flex justify-content-end mt-3">
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </div>
                         </form>
                     </div>
                 </div>
                 @endif
             </div>
         </div>
-    </div>
 
-    <!-- Modal Konfirmasi Hapus -->
-    <div wire:ignore.self class="modal fade" id="hapusModal" tabindex="-1" aria-labelledby="hapusModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="hapusModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus <strong>{{$pilpengguna->name ?? ''}}</strong>?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="batal">Batal</button>
-                    <button class="btn btn-danger" data-bs-dismiss="modal" wire:click="hapus">Hapus</button>
-                </div>
-            </div>
-        </div>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             Livewire.on('showLoading', () => {

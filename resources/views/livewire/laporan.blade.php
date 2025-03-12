@@ -10,9 +10,33 @@
 
         <div class="row">
             <div class="col-12">
-                <div class="card border-secondary">
-                    <div class="card-header">
-                        <h5 class="mb-0">Laporan</h5>
+                <div class="card">
+                    <div class="card-header bg-dark">
+                        <div class="col-md-12 col">
+                            <div class="col-md-12">
+                                <h5 class="mb-0 text-white" style="font-size: 25px;">Laporan</h5>
+                            </div>
+                            <div class="col-md-12 text-end">
+                                <!-- Pilihan Tahun -->
+                                <select class="form-control d-inline w-25" wire:model="selectedYear">
+                                    <option value="">Pilih Tahun</option>
+                                    @foreach($years as $year)
+                                    <option value="{{$year}}">{{$year}}</option>
+                                    @endforeach
+                                </select>
+                                <!-- Pilihan Bulan -->
+                                <select class="form-control d-inline w-25" wire:model="selectedMonth">
+                                    <option value="">Pilih Bulan</option>
+                                    @foreach($months as $month)
+                                    <option value="{{$month}}">{{date('F',  mktime(0, 0, 0, $month,  1))}}</option>
+                                    @endforeach
+
+                                </select>
+                                <!-- Tombol Cari -->
+                                <button class="btn btn-light d-inline w-15" wire:click="searchData">Cari</button>
+
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -46,24 +70,51 @@
                             </table>
                         </div>
 
-                        <nav class="mt-3">
-                            <ul class="pagination justify-content-start">
-                                <!-- Tombol Previous -->
+                        <nav aria-label="Pagination">
+                            <ul class="pagination">
+                                <!-- Tombol First  -->
+                                @if ($getLaporan->currentPage() > 3)
+                                <li class="page-item">
+                                    <a class="page-link" wire:click="gotoPage(1)" style="cursor: pointer;">
+                                        &laquo; First
+                                    </a>
+                                </li>
+                                @endif
+
+                                <!-- Tombol Previous  -->
                                 <li class="page-item {{ $getLaporan->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" wire:click="previousPage" wire:loading.attr="disabled" style="cursor: pointer;">&laquo; Previous</a>
+                                    <a class="page-link" wire:click="previousPage" wire:loading.attr="disabled" style="cursor: pointer;">
+                                        &laquo; Previous
+                                    </a>
                                 </li>
 
-                                <!-- Nomor Halaman -->
-                                @for ($page = 1; $page <= $getLaporan->lastPage(); $page++)
+                                <!-- Menampilkan maksimal 3 halaman sebelum dan sesudah halaman saat ini -->
+                                @php
+                                $start = max($getLaporan->currentPage() - 2, 1);
+                                $end = min($getLaporan->currentPage() + 2, $getLaporan->lastPage());
+                                @endphp
+
+                                @for ($page = $start; $page <= $end; $page++)
                                     <li class="page-item {{ $page == $getLaporan->currentPage() ? 'active' : '' }}">
-                                        <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
+                                    <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
                                     </li>
                                     @endfor
 
                                     <!-- Tombol Next -->
                                     <li class="page-item {{ !$getLaporan->hasMorePages() ? 'disabled' : '' }}">
-                                        <a class="page-link" wire:click="nextPage" wire:loading.attr="disabled" style="cursor: pointer;">Next &raquo;</a>
+                                        <a class="page-link" wire:click="nextPage" wire:loading.attr="disabled" style="cursor: pointer;">
+                                            Next &raquo;
+                                        </a>
                                     </li>
+
+                                    <!-- Tombol Last-->
+                                    @if ($getLaporan->currentPage() < $getLaporan->lastPage() - 2)
+                                        <li class="page-item">
+                                            <a class="page-link" wire:click="gotoPage({{ $getLaporan->lastPage() }})" style="cursor: pointer;">
+                                                Last &raquo;
+                                            </a>
+                                        </li>
+                                        @endif
                             </ul>
                         </nav>
 

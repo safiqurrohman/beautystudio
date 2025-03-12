@@ -1,15 +1,15 @@
 <div>
     <div class="container">
         <div class="row">
-            <h4 style="margin-top: -10px;">DATA TREATMENT</h4>
+            <h4 style="margin-top: -10px;">DATA TRANSAKSI</h4>
             <div class="col-12 my-2">
                 <button wire:click="pilihMenu('lihat')"
                     class="btn {{ $pilihanMenu=='lihat' ? 'btn-primary' : 'btn-outline-primary'}}">
                     Data
                 </button>
                 <button wire:click="pilihMenu('tambah')"
-                    class="btn {{$pilihanMenu=='tambah' ? 'btn-primary' : 'btn-outline-primary'}}">
-                    Tambah Treatment
+                    class="btn {{ $pilihanMenu=='tambah' ? 'btn-success' : 'btn-outline-success'}}">
+                    Transaksi
                 </button>
             </div>
         </div>
@@ -18,34 +18,35 @@
                 @if($pilihanMenu == 'lihat')
                 <div class="card border-primary">
                     <div class="card-header">
-                        Daftar Treatment
+                        Daftar User
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-border">
                                 <thead>
                                     <th>No</th>
+                                    <th>Tgl Daftar</th>
+                                    <th>Tgl Update</th>
+                                    <th>Karyawan</th>
                                     <th>Treatment</th>
-                                    <th>Kategori</th>
+                                    <th>Customer</th>
                                     <th>Harga</th>
                                     <th>Aksi</th>
                                 </thead>
                                 <tbody>
-                                    @foreach ($getTreatment as $treatment )
+                                    @foreach ($getTransaksi as $data )
                                     <tr>
-                                        <td>{{ ($getTreatment->currentPage() - 1) * $getTreatment->perPage() + $loop->iteration }}</td>
-                                        <td>{{$treatment->nama }}</td>
-                                        <td>{{$treatment->kategori }}</td>
-                                        <td>Rp{{number_format($treatment->harga, 0, ',', '.')}}</td>
+                                        <td>{{ ($getTransaksi->currentPage() - 1) * $getTransaksi->perPage() + $loop->iteration }}</td>
+                                        <td>{{$data->created_at->format('d-m-Y')}}</td>
+                                        <td>{{$data->updated_at->format('d-m-Y')}}</td>
+                                        <td>{{$data->karyawan->name }}</td>
+                                        <td>{{$data->treatment->nama }}</td>
+                                        <td>{{$data->customer->nama }}</td>
+                                        <td>Rp {{number_format($data->treatment->harga, 0, ',',  '.')}}</td>
                                         <td>
-                                            <button wire:click="pilihedit({{$treatment->id}})"
-                                                class="btn btn-warning my-2">
+                                            <button wire:click="pilihedit({{$data->id}})"
+                                                class="btn btn-warning ">
                                                 <i class="bi bi-pencil-square"></i>
-                                            </button>
-                                            <button wire:click="pilihhapus({{$treatment->id}})"
-                                                class="btn btn-danger"
-                                                data-bs-toggle="modal" data-bs-target="#hapusModal">
-                                                <i class="bi bi-trash3-fill"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -54,48 +55,26 @@
                             </table>
                             <nav aria-label="Pagination">
                                 <ul class="pagination">
-                                    {{-- Tombol First --}}
-                                    @if ($getTreatment->currentPage() > 3)
-                                    <li class="page-item">
-                                        <a class="page-link" wire:click="gotoPage(1)" style="cursor: pointer;">
-                                            &laquo; First
-                                        </a>
-                                    </li>
-                                    @endif
-
-                                    <!-- {{-- Tombol Previous --}} -->
-                                    <li class="page-item {{ $getTreatment->onFirstPage() ? 'disabled' : '' }}">
+                                    <!-- Tombol Previous -->
+                                    <li class="page-item {{ $getTransaksi->onFirstPage() ? 'disabled' : '' }}">
                                         <a class="page-link" wire:click="previousPage" wire:loading.attr="disabled" style="cursor: pointer;">
                                             &laquo; Previous
                                         </a>
                                     </li>
-                                    <!-- menampilkan maksimal  3 halaman  -->
-                                    @php
-                                    $start = max($getTreatment->currentPage() - 2, 1);
-                                    $end = min($getTreatment->currentPage() + 2, $getTreatment->lastPage());
-                                    @endphp
 
-                                    @for ($page = $start; $page <= $end; $page++)
-                                        <li class="page-item {{ $page == $getTreatment->currentPage() ? 'active' : '' }}">
-                                        <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
+                                    <!-- Nomor Halaman -->
+                                    @for ($page = 1; $page <= $getTransaksi->lastPage(); $page++)
+                                        <li class="page-item {{ $page == $getTransaksi->currentPage() ? 'active' : '' }}">
+                                            <a class="page-link" wire:click="gotoPage({{ $page }})" style="cursor: pointer;">{{ $page }}</a>
                                         </li>
                                         @endfor
 
-                                        <!-- {{-- Tombol Next --}} -->
-                                        <li class="page-item {{ !$getTreatment->hasMorePages() ? 'disabled' : '' }}">
+                                        <!-- Tombol Next -->
+                                        <li class="page-item {{ !$getTransaksi->hasMorePages() ? 'disabled' : '' }}">
                                             <a class="page-link" wire:click="nextPage" wire:loading.attr="disabled" style="cursor: pointer;">
                                                 Next &raquo;
                                             </a>
                                         </li>
-
-                                        <!-- {{-- Tombol Last --}} -->
-                                        @if ($getTreatment->currentPage() < $getTreatment->lastPage() - 2)
-                                            <li class="page-item">
-                                                <a class="page-link" wire:click="gotoPage({{ $getTreatment->lastPage() }})" style="cursor: pointer;">
-                                                    Last &raquo;
-                                                </a>
-                                            </li>
-                                            @endif
                                 </ul>
                             </nav>
                         </div>
@@ -106,21 +85,32 @@
                 <div class="card border-primary">
                     <div class="card-header">
                         <form wire:submit='simpan'>
-                            <label class="mt-2">Nama Treatment</label>
-                            <input type="text" class="form-control" wire:model='nama' placeholder="Masukkan Nama Treatment" />
+                            <label class="mt-2">Nama Lengkap</label>
+                            <input type="text" class="form-control" wire:model='nama' placeholder="Masukkan Nama" />
                             @error('nama')
                             <span class="text-danger">{{$message}}</span>
                             @enderror
                             <br>
-                            <label class="mt-2">Kategori</label>
-                            <input type="text" class="form-control" wire:model='kategori' placeholder="Masukkan Kategori" />
-                            @error('kategori')
+                            <label class="mt-2">Alamat Email</label>
+                            <input type="email" class="form-control" wire:model='email' placeholder="Masukkan Email" />
+                            @error('email')
                             <span class="text-danger">{{$message}}</span>
                             @enderror
                             <br>
-                            <label class="mt-2">Harga</label>
-                            <input type="text" class="form-control" wire:model='harga' placeholder="Masukkan Harga" />
-                            @error('harga')
+                            <label class="mt-2">Password</label>
+                            <input type="text" class="form-control" wire:model='password' placeholder="Masukkan Password" />
+                            @error('password')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
+                            <br>
+                            <label class="mt-2">Status</label>
+                            <select class="form-control" wire:model='role'>
+                                <option value="">Pilih Status User</option>
+                                <option value="admin">Admin</option>
+                                <option value="karyawan">Karyawan</option>
+                                <option value="custemer">Pelanggan</option>
+                            </select>
+                            @error('role')
                             <span class="text-danger">{{$message}}</span>
                             @enderror
                             <br>
@@ -132,29 +122,33 @@
                 @elseif($pilihanMenu == 'edit')
                 <div class="card border-primary">
                     <div class="card-header">
-                        Edit Layanan
+                        Edit Pengguna
                     </div>
                     <div class="card-body">
                         <form wire:submit='simpanEdit'>
-                            <label class="mt-2">Nama Treatment</label>
-                            <input type="text" class="form-control" wire:model='nama' placeholder="Masukkan Nama Treatment" />
+                            <label class="mt-2">Nama Lengkap</label>
+                            <input type="text" class="form-control" wire:model='nama' placeholder="Masukkan Nama" readonly />
                             @error('nama')
                             <span class="text-danger">{{$message}}</span>
                             @enderror
                             <br>
-                            <label class="mt-2">Kategori</label>
-                            <input type="text" class="form-control" wire:model='kategori' placeholder="Masukkan Kategori" />
-                            @error('kategori')
+                            <label class="mt-2">Alamat Email</label>
+                            <input type="email" class="form-control" wire:model='email' placeholder="Masukkan Email" readonly />
+                            @error('email')
                             <span class="text-danger">{{$message}}</span>
                             @enderror
                             <br>
-                            <label class="mt-2">Harga</label>
-                            <input type="text" class="form-control" wire:model='harga' placeholder="Masukkan Harga" />
-                            @error('kategori')
+                            <label class="mt-2">Status</label>
+                            <select class="form-control" wire:model='role'>
+                                <option value="">Pilih Status User</option>
+                                <option value="admin">Admin</option>
+                                <option value="karyawan">Karyawan</option>
+                                <option value="customer">Pelanggan</option>
+                            </select>
+                            @error('role')
                             <span class="text-danger">{{$message}}</span>
                             @enderror
                             <br>
-
                             <button type="submit" class="btn btn-primary mt-3">Simpan</button>
                             <button type="button" class="btn btn-secondary mt-3" wire:click='batal'>Batal</button>
                         </form>
@@ -174,7 +168,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus <strong>{{$piltretament->nama ?? ''}}</strong>?
+                    Apakah Anda yakin ingin menghapus <strong>{{$pilpengguna->name ?? ''}}</strong>?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="batal">Batal</button>
@@ -183,21 +177,6 @@
             </div>
         </div>
     </div>
-
-
-    <!-- Modal Loading
-    <div wire:ignore.self class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2">Mohon Tunggu...</p>
-                </div>
-            </div>
-        </div>
-    </div> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -215,16 +194,5 @@
         });
     </script>
 
-    <!-- Script untuk menutup modal setelah hapus/batal -->
-    <!-- <script>
-        document.addEventListener('livewire:load', function() {
-            Livewire.on('tutupModal', () => {
-                var hapusModal = bootstrap.Modal.getInstance(document.getElementById('hapusModal'));
-                if (hapusModal) {
-                    hapusModal.hide();
-                }
-            });
-        });
-    </script> -->
 
 </div>

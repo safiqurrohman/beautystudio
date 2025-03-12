@@ -25,9 +25,9 @@ class Gaji extends Component
         if (auth()->User()->role == 'karyawan') {
             $this->pilihanMenu = 'karyawan';
         }
-        $this->selectedMonth = Carbon::now()->month; // Default ke bulan ini
-        $this->selectedYear = Carbon::now()->year; // Default ke tahun ini
-        $this->selectedKaryawan = ''; // Default tidak memilih karyawan
+        $this->selectedMonth = Carbon::now()->month;
+        $this->selectedYear = Carbon::now()->year; 
+        $this->selectedKaryawan = ''; 
 
         // Mengambil daftar tahun unik dari database
         $this->years = Laporan::selectRaw('YEAR(created_at) as year')

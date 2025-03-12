@@ -30,11 +30,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn w-100" style="background-color: #ff66b2; color: white; border-radius: 5px;">Login</button>
-                <div class="mt-3">Belum punya akun?
-                    @if (Route::has('password.request'))
-                    <a class="text-decoration-none" href="{{ route('register') }}" style="color: #d63384;">Daftar</a>
-                    @endif
-                </div>
+               
             </form>
         </div>
     </div>
